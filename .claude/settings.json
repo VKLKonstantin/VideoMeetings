@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=$(cat | jq -r '.tool_input.file_path // .tool_input.notebook_path // empty'); if [ -z \"$f\" ]; then exit 0; fi; case \"$f\" in */apps/api/*) \"$CLAUDE_PROJECT_DIR/node_modules/.bin/prettier\" --write --ignore-unknown \"$f\" ;; */apps/web/*) (cd \"$CLAUDE_PROJECT_DIR/apps/web\" && \"$CLAUDE_PROJECT_DIR/node_modules/.bin/eslint\" --fix \"$f\") ;; *) \"$CLAUDE_PROJECT_DIR/node_modules/.bin/prettier\" --write --ignore-unknown \"$f\" ;; esac 2>/dev/null || true",
+            "statusMessage": "Formatting changed file"
+          }
+        ]
+      }
+    ]
+  }
+}
