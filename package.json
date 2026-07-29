@@ -6,13 +6,13 @@
     "apps/*"
   ],
   "scripts": {
-    "dev": "concurrently -n web,api -c blue,green \"npm run dev -w web\" \"npm run start:dev -w api\"",
-    "dev:web": "npm run dev -w web",
-    "dev:api": "npm run start:dev -w api",
-    "build": "npm run build --workspaces --if-present",
-    "lint": "npm run lint --workspaces --if-present",
-    "format": "npm run format --workspaces --if-present",
-    "test": "npm run test --workspaces --if-present"
+    "dev": "concurrently -n web,api -c blue,green \"yarn workspace web dev\" \"yarn workspace api start:dev\"",
+    "dev:web": "yarn workspace web dev",
+    "dev:api": "yarn workspace api start:dev",
+    "build": "yarn workspace web build && yarn workspace api build",
+    "lint": "yarn workspace web lint && yarn workspace api lint",
+    "format": "yarn workspace api format",
+    "test": "yarn workspace api test"
   },
   "devDependencies": {
     "concurrently": "^9.1.2"
