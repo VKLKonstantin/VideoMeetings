@@ -29,7 +29,11 @@ Run from the repo root (workspaces-aware):
 
 To target one workspace directly, use `yarn workspace web <script>` or `yarn workspace api <script>`, e.g. `yarn workspace api build`.
 
-**e2e tests are not wired to a root script** — they only exist for `apps/api` and must be run from there: `yarn workspace api test:e2e` (or `cd apps/api && yarn test:e2e`). See `apps/api/CLAUDE.md` for the full test commands (including running a single file/test) and what the test suites cover.
+**e2e tests are not part of the root `test` script** — they only exist for `apps/api` and must be run directly: `yarn workspace api test:e2e` (or `cd apps/api && yarn test:e2e`). They *are* wired into the pre-commit hook though — see below. See `apps/api/CLAUDE.md` for the full test commands (including running a single file/test) and what the test suites cover.
+
+## Pre-commit hook
+
+[Husky](https://typicode.github.io/husky/) is set up at the repo root (`.husky/pre-commit`, wired via `git config core.hooksPath` + the root `"prepare": "husky"` script that runs on `yarn install`). Every commit runs `yarn lint && yarn test && yarn workspace api test:e2e` (both workspaces' lint, then `apps/api`'s unit tests, then its e2e suite) and is blocked if any step fails — note the `&&` chain, not separate lines, so an earlier failure actually stops the commit instead of falling through to later steps and exiting with the last one's status. This makes commits noticeably slower than just `yarn test` (e2e spins up a real Nest app per suite) — expect a few extra seconds, not a big deal at this repo's size, but worth knowing if it grows. `apps/api`'s `lint` script runs with `--fix`, so a commit can silently modify files in place — review `git diff` after a commit if lint had anything to fix.
 
 ## Keeping docs in sync
 

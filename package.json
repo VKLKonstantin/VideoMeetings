@@ -12,9 +12,11 @@
     "build": "yarn workspace web build && yarn workspace api build",
     "lint": "yarn workspace web lint && yarn workspace api lint",
     "format": "yarn workspace api format",
-    "test": "yarn workspace api test"
+    "test": "yarn workspace api test",
+    "prepare": "husky"
   },
   "devDependencies": {
-    "concurrently": "^9.1.2"
+    "concurrently": "^9.1.2",
+    "husky": "^9.1.7"
   }
 }
