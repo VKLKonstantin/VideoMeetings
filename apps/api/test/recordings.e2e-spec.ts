@@ -178,6 +178,31 @@ describe('RecordingsController (e2e)', () => {
       expect(listResponse.body).toEqual([]);
     });
 
+    it('rejects a file whose content does not match its declared mimetype, without saving it (400)', async () => {
+      const meetingId = await createMeeting('user-1');
+      const server = app.getHttpServer();
+
+      // Passes the mimetype pre-filter (audio/wav is allowed) but the bytes
+      // aren't a real WAV/MP3/OGG/MP4/MOV/WebM — exercises the magic-byte
+      // sniff in file-signature.util.ts, not just the fileFilter layer.
+      await request(server)
+        .post(`/meetings/${meetingId}/recordings`)
+        .set(authHeader('user-1'))
+        .attach(
+          'file',
+          Buffer.from('this is plain text, not a real audio file'),
+          { filename: 'fake.wav', contentType: 'audio/wav' },
+        )
+        .expect(400);
+
+      const listResponse = await request(server)
+        .get(`/meetings/${meetingId}/recordings`)
+        .set(authHeader('user-1'))
+        .expect(200);
+
+      expect(listResponse.body).toEqual([]);
+    });
+
     it('rejects a file exceeding the maximum size without saving it (400)', async () => {
       const meetingId = await createMeeting('user-1');
       const server = app.getHttpServer();

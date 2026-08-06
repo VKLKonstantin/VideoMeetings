@@ -16,12 +16,13 @@ export async function detectMediaFormat(
 ): Promise<DetectedMediaFormat | null> {
   const buffer = Buffer.alloc(SIGNATURE_READ_BYTES);
   const handle = await open(filePath, 'r');
+  let bytesRead: number;
   try {
-    await handle.read(buffer, 0, SIGNATURE_READ_BYTES, 0);
+    ({ bytesRead } = await handle.read(buffer, 0, SIGNATURE_READ_BYTES, 0));
   } finally {
     await handle.close();
   }
-  return matchSignature(buffer);
+  return matchSignature(buffer.subarray(0, bytesRead));
 }
 
 function matchSignature(buffer: Buffer): DetectedMediaFormat | null {
